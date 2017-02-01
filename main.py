@@ -30,6 +30,14 @@ EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
 def valid_email(email):
     return EMAIL_RE.match(email)
 
+error_username = ""
+
+error_password = ""
+
+error_verify = ""
+
+error_email = ""
+
 header = """
 <!DOCTYPE html>
 <html>
@@ -44,31 +52,34 @@ header = """
             <title>Signup</title>
                 <h1>Signup</h1>
 """
-
 username = """
     <label>
         Username
         <input type='text' name='username' value=''>
     </label>
 """
+
 password = """
     <label>
         Password
         <input type='password' name='password' value=''>
     </label>
 """
+
 verify = """
     <label>
         Verify Password
         <input type='password' name='verify' value ''>
     </label>
 """
+
 email = """
     <label>
         Email (optional)
         <input type='text' name='email' value=''>
     </label>
 """
+
 submit = """
     <input type='submit' value='Sign Up!'/>
 """
@@ -81,7 +92,7 @@ form_end = """
 """
 
 content = (
-form + username + "<br>" + password + "<br>" + verify + "<br>" + email + "<br>" + submit + form_end
+form + username + "<br>" + password + "<br>" + verify + "<br>" + email + "<br><br>" + submit + form_end
 )
 
 footer = """
@@ -100,28 +111,90 @@ class MainHandler(webapp2.RequestHandler):
 
 class SignUp(webapp2.RequestHandler):
     def post(self):
-        username = self.request.get('username')
-        if valid_username(username) == None:
-            error_username = (
-            "<p class='error'>" +
-            valid_username(username) +
-            "</p>")
+        input_username = self.request.get('username')
+        if valid_username(input_username) == None:
+            error_username ="""
+            <text class='error'>
+            The username entered is not valid!
+            </text>
+            """
         else:
             error_username = ""
-        #password = self.request.get('password')
-        #good_password = valid_password(password)
-        #if good_password == None:
-        #    self.response.write("Your Password is bad.")
-        #verify = self.request.get('verify')
-        #if verify != password:
-        #    self.response.write("Your passwords don't match!")
-        email = self.request.get('email')
-        if email == "":
+        username = """
+            <label>
+                Username
+                <input type='text' name='username' value='{0}'>
+            </label>{1}
+        """.format(input_username, error_username)
+
+        input_password = self.request.get('password')
+        if valid_password(input_password) == None:
+            error_password = """
+            <text class='error'>
+            The password entered is not valid!
+            </text>
+            """
+        else:
+            error_password = ""
+        password = """
+            <label>
+                Password
+                <input type='password' name='password' value=''>
+            </label>{0}
+        """.format(error_password)
+
+        verify = self.request.get('verify')
+        error_verify = ""
+        if verify != input_password:
+            error_verify = """
+            <text class='error'>
+            Your passwords don't match!
+            </text>
+            """
+        verify = """
+            <label>
+                Verify Password
+                <input type='password' name='verify' value ''>
+            </label>{0}
+        """.format(error_verify)
+
+        input_email = self.request.get('email')
+        error_email = ""
+        save_email = """
+        <label>
+        Email (optional)
+        <input type='text' name='email' value='{0}'>
+        </label>{1}
+        """.format(input_email, error_email)
+        if input_email == "":
             pass
         else:
-            email = valid_email(email)
-            if email == None:
-                self.response.write("Your email is invalid.")
+            input_email = valid_email(input_email)
+            if input_email == None:
+                error_email = """
+                <text class='error'>
+                Your email is invalid!
+                </text>
+                """
+                save_email = """
+                <label>
+                Email (optional)
+                <input type='text' name='email' value='{0}'>
+                </label>{1}
+                """.format(input_email, error_email)
+
+        if error_username == '':
+            if error_verify == '':
+                if error_email == '':
+                    self.redirect("/welcome?username=" + input_username)
+
+        content = (
+        form + username + "<br>" + password + "<br>" + verify + "<br>" + save_email + "<br><br>" + submit + form_end
+        )
+        page = header + "<br>" + content + "<br>" + footer
+        self.response.write(page)
+
+
 
         #self.redirect('/welcome')
 
