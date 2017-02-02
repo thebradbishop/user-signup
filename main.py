@@ -69,7 +69,7 @@ password = """
 verify = """
     <label>
         Verify Password
-        <input type='password' name='verify' value ''>
+        <input type='password' name='verify' value=''>
     </label>
 """
 
@@ -126,7 +126,7 @@ class SignUp(webapp2.RequestHandler):
                 <input type='text' name='username' value='{0}'>
             </label>{1}
         """.format(input_username, error_username)
-
+        
         input_password = self.request.get('password')
         if valid_password(input_password) == None:
             error_password = """
